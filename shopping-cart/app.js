@@ -13,7 +13,27 @@ var index = require('./routes/index');
 var app = express();
 
 mongoose.Promise = global.Promise;
-mongoose.connect('localhost:27017/shopping')
+mongoose.connect('mongodb://shopping:password12@ds056789.mlab.com:56789/shoppingbasket');
+// mongoose.connect('localhost:27017/shopping')
+
+let connection = mongoose.connection;
+
+mongoose.connect(connectionString, {
+    server: { socketOptions: { keepAlive: 300000, connectTimeoutMS: 30000 } },
+    replset: { socketOptions: { keepAlive: 300000, connectTimeoutMS: 30000 } }
+});
+
+connection.on('error', (err) => {
+    console.log('there was a connection problem', err)
+});
+
+connection.once('open', () => {
+    console.log('now connected to db')
+    server.listen(8080, function () {
+        console.log('server working', 'http://localhost' + PORT)
+    })
+})
+
 
 // view engine setup
 app.engine('.hbs', expressHbs({defaultLayout: 'layout', extname: '.hbs'}));
